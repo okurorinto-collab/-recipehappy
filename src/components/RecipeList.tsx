@@ -13,11 +13,11 @@ type Recipe = {
 }
 
 const CATEGORIES = [
-  { key: 'all', label: 'すべて', icon: '🍽' },
-  { key: 'gattsu', label: 'ガッツリ', icon: '🍖' },
-  { key: 'assari', label: 'あっさり', icon: '🥗' },
-  { key: 'jitan', label: '時短', icon: '⚡' },
-  { key: 'oyatsu', label: 'おやつ', icon: '🍰' },
+  { key: 'all', label: 'すべて', icon: null, svg: '/icon_Dish.svg' },
+  { key: 'gattsu', label: 'ガッツリ', icon: null, svg: '/icon_meet.svg' },
+  { key: 'assari', label: 'あっさり', icon: null, svg: '/icon_salad.svg' },
+  { key: 'jitan', label: '時短', icon: '⚡', svg: null },
+  { key: 'oyatsu', label: 'おやつ', icon: null, svg: '/icon_cake.svg' },
 ]
 
 const CATEGORY_KEYWORDS: Record<string, string[]> = {
@@ -67,7 +67,9 @@ export default function RecipeList({
             <button key={cat.key} onClick={() => setCategory(cat.key)}
               className={`flex flex-col items-center gap-1 flex-shrink-0 transition ${isActive ? 'opacity-100' : 'opacity-40'}`}>
               <div className={`w-14 h-14 rounded-lg flex items-center justify-center text-2xl ${isActive ? 'bg-green-500' : 'bg-gray-100'}`}>
-                {cat.icon}
+                {cat.svg
+                  ? <img src={cat.svg} alt={cat.label} className="w-8 h-8" />
+                  : cat.icon}
               </div>
               <span className={`text-xs font-medium ${isActive ? 'text-green-600' : 'text-gray-500'}`}>{cat.label}</span>
             </button>
