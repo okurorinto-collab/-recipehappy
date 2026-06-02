@@ -1,5 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { NextRequest, NextResponse } from 'next/server'
+import { getAuthUser } from '@/lib/supabase/auth-check'
+import { fetchPexelsThumbnail } from '@/lib/utils'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
@@ -30,11 +32,11 @@ const URL_PROMPT = `このテキストはレシピページのHTMLです。レ�
 
 async function extractFromImages(files: File[]) {
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
-  const parts: Parameters<typeof model.generateContent>[0] = [PROMPT]
+  const parts: unknown[] = [PROMPT]
   for (const file of files) {
     const bytes = await file.arrayBuffer()
     const base64 = Buffer.from(bytes).toString('base64')
-    parts.push({ inlineData: { mimeType: file.type, data: base64 } } as never)
+    parts.push({ inlineData: { mimeType: file.type, data: base64 } })
   }
   const result = await model.generateContent(parts as never)
   const text = result.response.text().trim()
@@ -66,13 +68,17 @@ function calcSimilarity(a: string, b: string): number {
 }
 
 export async function POST(request: NextRequest) {
+  // 認証チェック
+  const user = await getAuthUser()
+  if (!user) return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
+
   try {
     const formData = await request.formData()
     const files = formData.getAll('images') as File[]
     const sourceUrl = formData.get('sourceUrl') as string | null
 
-    let imageResult: ReturnType<typeof extractFromImages> extends Promise<infer T> ? T : never = null as never
-    let urlResult: typeof imageResult = null as never
+    let imageResult: Record<string, unknown> | null = null
+    let urlResult: Record<string, unknown> | null = null
 
     if (files.length > 0) {
       imageResult = await extractFromImages(files)
@@ -85,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     // 両方ある場合は一致チェック
     if (imageResult && urlResult && !urlResult.error) {
-      const sim = calcSimilarity(imageResult.title ?? '', urlResult.title ?? '')
+      const sim = calcSimilarity(String(imageResult.title ?? ''), String(urlResult.title ?? ''))
       if (sim < 0.3) {
         return NextResponse.json({
           error: 'mismatch',
@@ -94,10 +100,9 @@ export async function POST(request: NextRequest) {
           urlResult,
         }, { status: 409 })
       }
-      // 一致→統合（スクショ優先、URLで補完）
       imageResult.steps = imageResult.steps || urlResult.steps
-      imageResult.ingredients = imageResult.ingredients?.length ? imageResult.ingredients : urlResult.ingredients
-      imageResult.seasonings = imageResult.seasonings?.length ? imageResult.seasonings : urlResult.seasonings
+      imageResult.ingredients = (imageResult.ingredients as unknown[])?.length ? imageResult.ingredients : urlResult.ingredients
+      imageResult.seasonings = (imageResult.seasonings as unknown[])?.length ? imageResult.seasonings : urlResult.seasonings
     }
 
     const finalResult = imageResult ?? urlResult
@@ -105,25 +110,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'レシピが見つかりませんでした' }, { status: 422 })
     }
 
-    // Pexelsサムネイル取得（タイトル→メイン食材の順でフォールバック）
-    let thumbnailUrl: string | null = null
-    try {
-      const mainIngredient = finalResult.ingredients?.[0]?.split('|')[0] ?? ''
-      const queries = [
-        finalResult.title,
-        mainIngredient ? `${mainIngredient} 料理` : '',
-        '料理 food',
-      ].filter(Boolean)
-
-      for (const q of queries) {
-        const pexelsRes = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=1&orientation=landscape`, {
-          headers: { Authorization: process.env.PEXELS_API_KEY! },
-        })
-        const pexelsData = await pexelsRes.json()
-        thumbnailUrl = pexelsData.photos?.[0]?.src?.medium ?? null
-        if (thumbnailUrl) break
-      }
-    } catch { /* 無視 */ }
+    const thumbnailUrl = await fetchPexelsThumbnail(
+      String(finalResult.title ?? ''),
+      (finalResult.ingredients as string[]) ?? []
+    )
 
     return NextResponse.json({
       title: finalResult.title,

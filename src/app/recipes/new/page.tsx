@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import AnalyzingLoader from '@/components/AnalyzingLoader'
+import { parseItem } from '@/lib/utils'
 
 const CATEGORIES = [
   { key: 'gattsu', label: 'ガッツリ', icon: '🍖' },
@@ -19,11 +20,6 @@ type Extracted = {
   seasonings: string[]
   steps: string
   category: string
-}
-
-function parseItem(item: string) {
-  const [name, amount] = item.split('|')
-  return { name: name ?? item, amount: amount ?? '' }
 }
 
 export default function NewRecipePage() {

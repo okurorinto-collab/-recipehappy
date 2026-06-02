@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getAuthUser } from '@/lib/supabase/auth-check'
 
 export async function GET(request: NextRequest) {
+  const user = await getAuthUser()
+  if (!user) return NextResponse.json({ ok: false, message: '認証が必要です' }, { status: 401 })
+
   const url = request.nextUrl.searchParams.get('url')
   if (!url) return NextResponse.json({ ok: false, message: 'URLを入力してください' })
 
@@ -17,12 +21,10 @@ export async function GET(request: NextRequest) {
     const html = await res.text()
     const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
 
-    // レシピらしいキーワードチェック
-    const recipeKeywords = ['材料', '作り方', '手順', 'ingredients', 'instructions', 'recipe', 'レシピ', '小さじ', '大さじ', 'g ', 'ml']
+    const recipeKeywords = ['材料', '作り方', '手順', 'ingredients', 'instructions', 'recipe', 'レシピ', '小さじ', '大さじ']
     const found = recipeKeywords.filter(kw => text.toLowerCase().includes(kw.toLowerCase()))
 
     if (found.length >= 2) {
-      // タイトル取得
       const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i)
       const title = titleMatch?.[1]?.trim() ?? 'タイトル不明'
       return NextResponse.json({ ok: true, message: `レシピ情報を取得できそうです「${title.slice(0, 30)}」` })
