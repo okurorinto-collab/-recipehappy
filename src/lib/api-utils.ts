@@ -55,13 +55,35 @@ export async function fetchWikipediaImage(title: string): Promise<string | null>
   return null
 }
 
+const JP_TO_EN: Record<string, string> = {
+  'プリン': 'pudding', 'カレー': 'curry', 'ラーメン': 'ramen', 'うどん': 'udon noodles',
+  'そば': 'soba noodles', 'パスタ': 'pasta', 'ピザ': 'pizza', 'ハンバーグ': 'hamburger steak',
+  '唐揚げ': 'fried chicken', 'から揚げ': 'fried chicken', '餃子': 'gyoza dumplings',
+  'チャーハン': 'fried rice', '親子丼': 'oyakodon rice bowl', '牛丼': 'beef bowl',
+  'みそ汁': 'miso soup', '味噌汁': 'miso soup', '肉じゃが': 'nikujaga stew',
+  '天ぷら': 'tempura', '寿司': 'sushi', 'おにぎり': 'onigiri rice ball',
+  'チーズケーキ': 'cheesecake', 'ショートケーキ': 'strawberry shortcake',
+  'クッキー': 'cookies', 'パンケーキ': 'pancakes', 'ホットケーキ': 'pancakes',
+  '炒め物': 'stir fry', '煮物': 'simmered dish', '焼き魚': 'grilled fish',
+  'エビマヨ': 'shrimp mayonnaise', '麻婆豆腐': 'mapo tofu',
+}
+
+function toEnglishQuery(title: string): string {
+  for (const [jp, en] of Object.entries(JP_TO_EN)) {
+    if (title.includes(jp)) return en
+  }
+  return title
+}
+
 export async function fetchPexelsThumbnail(title: string, ingredients: string[] = []): Promise<string | null> {
   const mainIngredient = ingredients[0]?.split('|')[0] ?? ''
+  const enTitle = toEnglishQuery(title)
   const queries = [
+    enTitle !== title ? enTitle : title,
     title,
-    mainIngredient ? `${mainIngredient} 料理` : '',
-    '料理 food',
-  ].filter(Boolean)
+    mainIngredient ? `${mainIngredient} food` : '',
+    'Japanese food',
+  ].filter((q, i, arr) => q && arr.indexOf(q) === i)
 
   for (const q of queries) {
     try {
