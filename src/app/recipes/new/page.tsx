@@ -24,7 +24,6 @@ type Extracted = {
 
 export default function NewRecipePage() {
   const router = useRouter()
-  const supabase = createClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [images, setImages] = useState<File[]>([])
@@ -81,6 +80,7 @@ export default function NewRecipePage() {
   const handleSave = async () => {
     if (!extracted) return
     setLoading(true)
+    const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/login'); return }
 
