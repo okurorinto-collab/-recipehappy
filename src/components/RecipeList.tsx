@@ -80,9 +80,16 @@ export default function RecipeList({
       {/* レシピグリッド */}
       <div className="px-4 pt-4 pb-8">
         {filtered.length === 0 ? (
-          <div className="text-center text-gray-400 py-24">
-            <div className="text-5xl mb-4">🍽</div>
-            <p className="text-sm">レシピがありません</p>
+          <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <img src="/recipe_none.svg" alt="レシピなし" className="w-32 h-32 opacity-60" />
+            <div className="text-center">
+              <p className="font-bold text-gray-700 text-lg">レシピがありません</p>
+              <p className="text-gray-400 text-sm mt-1">レシピを追加してください</p>
+            </div>
+            <a href="/recipes/new"
+              className="bg-green-500 text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-green-600 transition">
+              レシピを作成する
+            </a>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
