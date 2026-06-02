@@ -34,12 +34,12 @@ export default async function RecipesPage({
         <div className="bg-white px-5 pt-8 pb-5">
           <div className="flex items-start justify-between mb-1">
             <div>
-              <p className="text-sm text-gray-400">こんにちは、{userName}さん👋</p>
+              <p className="text-sm text-gray-400">こんにちは、{userName}さん</p>
               <h1 className="text-2xl font-bold text-gray-900 mt-1">何を食べますか？</h1>
             </div>
             <Link href="/recipes/new"
-              className="bg-green-500 text-white w-10 h-10 rounded-lg flex items-center justify-center text-xl font-bold hover:bg-green-600 transition flex-shrink-0 mt-1">
-              +
+              className="bg-green-500 text-white px-4 h-10 rounded-lg flex items-center gap-1 text-sm font-semibold hover:bg-green-600 transition flex-shrink-0 mt-1">
+              <span className="text-lg leading-none">+</span> レシピを追加
             </Link>
           </div>
         </div>
