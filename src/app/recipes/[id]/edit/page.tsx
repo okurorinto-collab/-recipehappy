@@ -22,6 +22,7 @@ export default function EditRecipePage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [fetchingThumb, setFetchingThumb] = useState(false)
+  const [genStatus, setGenStatus] = useState('')
 
   useEffect(() => {
     supabase.from('recipes').select('*').eq('id', id).single().then(({ data }) => {
@@ -120,46 +121,48 @@ export default function EditRecipePage() {
               value={sourceUrl} onChange={(e) => setSourceUrl(e.target.value)} placeholder="https://..." />
           </div>
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-xs font-semibold text-gray-400">サムネイル画像URL</p>
-              <button
-                onClick={async () => {
-                  setFetchingThumb(true)
-                  try {
-                    const params = new URLSearchParams({ q: title, regen: '1' })
-                    if (sourceUrl) params.set('sourceUrl', sourceUrl)
-                    const r = await fetch(`/api/thumbnail-search?${params}`)
-                    const data = await r.json()
-                    if (data.url) setThumbnailUrl(data.url)
-                  } finally {
-                    setFetchingThumb(false)
-                  }
-                }}
-                disabled={fetchingThumb}
-                className="text-xs text-green-600 hover:text-green-700 disabled:opacity-40">
-                {fetchingThumb ? '取得中...' : '🔄 画像を再取得'}
-              </button>
-            </div>
+            <p className="text-xs font-semibold text-gray-400 mb-1">サムネイル画像URL</p>
             <input type="url" className="w-full text-sm border-b border-gray-200 focus:outline-none pb-1 text-gray-700"
               value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} placeholder="Google画像検索などから貼り付け" />
             {thumbnailUrl && (
               <img src={thumbnailUrl} alt="preview" className="mt-2 h-24 rounded-lg object-cover"
-                onError={async (e) => {
-                  e.currentTarget.style.display = 'none'
-                  // 自動で別のURLを探す
+                onError={(e) => { e.currentTarget.style.display = 'none' }} />
+            )}
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={async () => {
                   setFetchingThumb(true)
                   try {
-                    const params = new URLSearchParams({ q: title })
+                    const params = new URLSearchParams({ q: title, source: 'web', regen: '1' })
                     if (sourceUrl) params.set('sourceUrl', sourceUrl)
                     const r = await fetch(`/api/thumbnail-search?${params}`)
                     const data = await r.json()
                     if (data.url) setThumbnailUrl(data.url)
+                  } finally { setFetchingThumb(false) }
+                }}
+                disabled={fetchingThumb || genStatus !== ''}
+                className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition disabled:opacity-40">
+                {fetchingThumb ? '取得中...' : '🌐 Webから取得'}
+              </button>
+              <button
+                onClick={async () => {
+                  setGenStatus('AI生成中...（20〜30秒）')
+                  try {
+                    const params = new URLSearchParams({ q: title, source: 'ai' })
+                    const r = await fetch(`/api/thumbnail-search?${params}`)
+                    const data = await r.json()
+                    if (data.url) setThumbnailUrl(data.url)
+                    else setGenStatus('生成に失敗しました')
                   } finally {
-                    setFetchingThumb(false)
+                    setGenStatus(s => s === 'AI生成中...（20〜30秒）' ? '' : s)
                   }
-                }} />
-            )}
-            {fetchingThumb && <p className="text-xs text-green-600 mt-1">別の画像を探しています...</p>}
+                }}
+                disabled={fetchingThumb || genStatus !== ''}
+                className="text-xs bg-green-500 text-white px-3 py-1.5 rounded-lg hover:bg-green-600 transition disabled:opacity-40">
+                ✨ AIで生成
+              </button>
+            </div>
+            {genStatus && <p className="text-xs text-green-600 mt-1">{genStatus}</p>}
           </div>
 
           <ItemList list={ingredients} setList={setIngredients} label="食材" />

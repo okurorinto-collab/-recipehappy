@@ -8,6 +8,12 @@ export async function GET(request: NextRequest) {
   const url = request.nextUrl.searchParams.get('url')
   if (!url) return NextResponse.json({ ok: false, message: 'URLを入力してください' })
 
+  // SNSは非対応（ログイン必須でレシピが読めない）
+  const snsDomains = ['instagram.com', 'x.com', 'twitter.com', 'tiktok.com', 'facebook.com']
+  if (snsDomains.some(d => url.includes(d))) {
+    return NextResponse.json({ ok: false, message: 'SNS（Instagram・X・TikTok等）は非対応です。スクショから追加してください' })
+  }
+
   try {
     const res = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0' },

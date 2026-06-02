@@ -13,35 +13,38 @@ export async function GET(request: NextRequest) {
   const q = request.nextUrl.searchParams.get('q') ?? ''
   const sourceUrl = request.nextUrl.searchParams.get('sourceUrl') ?? ''
   const regen = request.nextUrl.searchParams.get('regen') === '1'
-  console.log('[thumbnail-search] start q:', q, 'sourceUrl:', sourceUrl, 'regen:', regen)
+  // source: 'web' = og/Pexels/Wikipedia / 'ai' = Gemini生成のみ
+  const source = request.nextUrl.searchParams.get('source') ?? 'web'
+  console.log('[thumbnail-search] start q:', q, 'source:', source, 'regen:', regen)
 
-  // 1. 元ネタURLのog:imageを優先（SNSはスキップ。再取得時はスキップして別画像を探す）
-  const skipDomains = ['instagram.com', 'x.com', 'twitter.com', 'tiktok.com', 'facebook.com']
-  const isSns = skipDomains.some(d => sourceUrl.includes(d))
+  if (source === 'web') {
+    // 1. 元ネタURLのog:image（SNS・再取得時はスキップ）
+    const skipDomains = ['instagram.com', 'x.com', 'twitter.com', 'tiktok.com', 'facebook.com']
+    const isSns = skipDomains.some(d => sourceUrl.includes(d))
 
-  if (!regen && sourceUrl && !isSns) {
-    const ogImage = await fetchOgImage(sourceUrl)
-    console.log('[thumbnail-search] ogImage:', ogImage)
-    if (ogImage && !ogImage.includes('rsrc.php') && !ogImage.includes('logo')) {
-      return NextResponse.json({ url: ogImage })
+    if (!regen && sourceUrl && !isSns) {
+      const ogImage = await fetchOgImage(sourceUrl)
+      if (ogImage && !ogImage.includes('rsrc.php') && !ogImage.includes('logo')) {
+        return NextResponse.json({ url: ogImage })
+      }
     }
+
+    // 2. Pexels（再取得時はランダム）
+    if (q && process.env.PEXELS_API_KEY) {
+      const url = await fetchPexelsThumbnail(q, [], regen)
+      if (url) return NextResponse.json({ url })
+    }
+
+    // 3. Wikipedia
+    if (q) {
+      const url = await fetchWikipediaImage(q)
+      if (url) return NextResponse.json({ url })
+    }
+
+    return NextResponse.json({ url: null, message: 'Webで画像が見つかりませんでした。AI生成を試してください' })
   }
 
-  // 2. Pexelsでタイトル検索（再取得時はランダムに別候補）
-  if (q && process.env.PEXELS_API_KEY) {
-    const url = await fetchPexelsThumbnail(q, [], regen)
-    console.log('[thumbnail-search] pexels:', url)
-    if (url) return NextResponse.json({ url })
-  }
-
-  // 3. Wikipedia（認証不要・無料フォールバック）
-  if (q) {
-    const url = await fetchWikipediaImage(q)
-    console.log('[thumbnail-search] wikipedia:', url)
-    if (url) return NextResponse.json({ url })
-  }
-
-  // 4. それでも無ければGeminiで画像生成→Supabase Storageへ保存
+  // source === 'ai': Geminiで画像生成→Supabase Storageへ保存
   if (q) {
     const base64 = await generateFoodImageBase64(q)
     if (base64) {
