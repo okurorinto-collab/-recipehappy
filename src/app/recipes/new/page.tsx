@@ -155,7 +155,7 @@ export default function NewRecipePage() {
         </div>
 
         <div className="mb-4">
-          <input type="url" placeholder="元ネタURL（任意）" value={sourceUrl}
+          <input type="url" placeholder="レシピのURLを貼ってください（任意）" value={sourceUrl}
             onChange={(e) => { setSourceUrl(e.target.value); setUrlCheck(null) }}
             className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-300" />
           {sourceUrl && (
