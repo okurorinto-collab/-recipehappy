@@ -6,11 +6,21 @@ import FetchThumbnailButton from '@/components/FetchThumbnailButton'
 import { parseItem } from '@/lib/utils'
 
 function parseSteps(steps: string): string[] {
-  const normalized = steps.replace(/([。．])\s*\d+[.．]\s+/g, '$1\n')
-  return normalized
-    .split(/\n|①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩/)
-    .map(s => s.replace(/^[\d\s．.、。]+/, '').trim())
+  // まず改行・丸数字・「数字.」で分割
+  let parts = steps
+    .split(/\n|[①②③④⑤⑥⑦⑧⑨⑩]|(?<=。)\s*\d+[.．、)]\s*/)
+    .map(s => s.replace(/^[\d\s．.、。)]+/, '').trim())
     .filter(Boolean)
+
+  // 分割されなかった（1塊の長文）場合は句点で文単位に分割
+  if (parts.length <= 1 && steps.length > 60) {
+    parts = steps
+      .split(/。/)
+      .map(s => s.trim())
+      .filter(Boolean)
+      .map(s => (s.endsWith('。') ? s : s + '。'))
+  }
+  return parts
 }
 
 export default async function RecipeDetailPage({ params }: { params: Promise<{ id: string }> }) {
