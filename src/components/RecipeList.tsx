@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 type Recipe = {
@@ -45,14 +44,8 @@ export default function RecipeList({
   filterIngredients: string[]
   activeCategory: string
 }) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  const setCategory = (key: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    if (key === 'all') params.delete('category')
-    else params.set('category', key)
-    router.push(`/recipes?${params.toString()}`)
+  const getCategoryUrl = (key: string) => {
+    return key === 'all' ? '/recipes' : `/recipes?category=${key}`
   }
 
   const filtered = recipes.filter(r => matchesCategory(r, activeCategory))
@@ -64,7 +57,7 @@ export default function RecipeList({
         {CATEGORIES.map((cat) => {
           const isActive = (activeCategory === cat.key) || (cat.key === 'all' && !activeCategory)
           return (
-            <button key={cat.key} onClick={() => setCategory(cat.key)}
+            <Link key={cat.key} href={getCategoryUrl(cat.key)}
               className={`flex flex-col items-center gap-1 flex-shrink-0 transition ${isActive ? 'opacity-100' : 'opacity-40'}`}>
               <div className={`w-14 h-14 rounded-lg flex items-center justify-center text-2xl ${isActive ? 'bg-green-500' : 'bg-gray-100'}`}>
                 {cat.svg
@@ -72,7 +65,7 @@ export default function RecipeList({
                   : cat.icon}
               </div>
               <span className={`text-xs font-medium ${isActive ? 'text-green-600' : 'text-gray-500'}`}>{cat.label}</span>
-            </button>
+            </Link>
           )
         })}
       </div>
