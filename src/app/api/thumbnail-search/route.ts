@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/supabase/auth-check'
-import { fetchPexelsThumbnail, fetchOgImage } from '@/lib/utils'
+import { fetchPexelsThumbnail, fetchOgImage } from '@/lib/api-utils'
 
 export async function GET(request: NextRequest) {
   const user = await getAuthUser()
