@@ -144,9 +144,22 @@ export default function EditRecipePage() {
               value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} placeholder="Google画像検索などから貼り付け" />
             {thumbnailUrl && (
               <img src={thumbnailUrl} alt="preview" className="mt-2 h-24 rounded-lg object-cover"
-                onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden') }} />
+                onError={async (e) => {
+                  e.currentTarget.style.display = 'none'
+                  // 自動で別のURLを探す
+                  setFetchingThumb(true)
+                  try {
+                    const params = new URLSearchParams({ q: title })
+                    if (sourceUrl) params.set('sourceUrl', sourceUrl)
+                    const r = await fetch(`/api/thumbnail-search?${params}`)
+                    const data = await r.json()
+                    if (data.url) setThumbnailUrl(data.url)
+                  } finally {
+                    setFetchingThumb(false)
+                  }
+                }} />
             )}
-            {thumbnailUrl && <p className="hidden text-xs text-red-400 mt-1">この画像URLは表示できません。Google画像検索のURLを使ってください。</p>}
+            {fetchingThumb && <p className="text-xs text-green-600 mt-1">別の画像を探しています...</p>}
           </div>
 
           <ItemList list={ingredients} setList={setIngredients} label="食材" />
