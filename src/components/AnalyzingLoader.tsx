@@ -24,7 +24,7 @@ export default function AnalyzingLoader() {
         <Lottie animationData={animationData} loop />
       </div>
       <div className="text-center">
-        <p className="font-semibold text-gray-700 mb-4">AIが解析中...</p>
+        <p className="font-semibold text-gray-700 mb-4">レシピを書いてます...</p>
         <div className="w-64 bg-gray-100 rounded-full h-2 overflow-hidden">
           <div
             className="h-2 bg-green-500 rounded-full transition-all duration-300"
