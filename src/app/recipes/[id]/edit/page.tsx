@@ -45,8 +45,17 @@ export default function EditRecipePage() {
       setSeasonings((data.seasonings as string[] ?? []).map(parseItem))
       setSteps(data.steps ?? '')
       setSourceUrl(data.source_url ?? '')
-      setThumbnailUrl(data.thumbnail_url ?? '')
+      const thumb = data.thumbnail_url ?? ''
+      setThumbnailUrl(thumb)
       setLoading(false)
+
+      // サムネイルが空なら自動取得
+      if (!thumb) {
+        fetch(`/api/thumbnail-search?q=${encodeURIComponent(data.title)}`)
+          .then(r => r.json())
+          .then(d => { if (d.url) setThumbnailUrl(d.url) })
+          .catch(() => {})
+      }
     })
   }, [id])
 
