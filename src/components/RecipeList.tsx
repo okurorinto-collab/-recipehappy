@@ -70,8 +70,8 @@ export default function RecipeList({
         })}
       </div>
 
-      {/* レシピグリッド */}
-      <div className="px-4 pt-4 pb-8">
+      {/* レシピリスト */}
+      <div className="pb-8">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <img src="/recipe_none.svg" alt="レシピなし" className="w-32 h-32 opacity-60" />
@@ -85,21 +85,20 @@ export default function RecipeList({
             </a>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="divide-y divide-gray-100">
             {filtered.map((recipe) => (
-              <Link key={recipe.id} href={`/recipes/${recipe.id}`}
-                className="bg-white rounded-lg  overflow-hidden hover: transition">
-                <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-green-100 to-green-200">
+              <Link key={recipe.id} href={`/recipes/${recipe.id}`} className="block">
+                <div className="mx-[2px] relative aspect-[4/3] bg-gradient-to-br from-green-100 to-green-200 overflow-hidden">
                   {recipe.thumbnail_url ? (
                     <img src={recipe.thumbnail_url} alt={recipe.title}
                       className="w-full h-full object-cover"
                       onError={(e) => { e.currentTarget.style.display = 'none' }} />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl">🍳</div>
+                    <div className="w-full h-full flex items-center justify-center text-5xl">🍳</div>
                   )}
                 </div>
-                <div className="px-2 py-1.5">
-                  <h2 className="font-medium text-gray-800 text-xs leading-snug line-clamp-2">{recipe.title}</h2>
+                <div className="px-3 py-2">
+                  <h2 className="font-medium text-gray-800 text-sm leading-snug">{recipe.title}</h2>
                 </div>
               </Link>
             ))}
