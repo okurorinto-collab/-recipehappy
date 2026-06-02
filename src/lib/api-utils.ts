@@ -79,10 +79,13 @@ function toEnglishQuery(title: string): string {
 async function generateSearchKeywords(title: string): Promise<string[]> {
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': process.env.GEMINI_API_KEY!,
+        },
         body: JSON.stringify({
           contents: [{ parts: [{ text: `料理「${title}」の写真をストックフォトで探すための英語検索キーワードを、ヒットしやすい順に3つ、カンマ区切りだけで返してください（説明不要）。例: fluffy pancakes, japanese pancake, dessert` }] }],
         }),
@@ -122,10 +125,13 @@ export async function generateFoodImageBase64(title: string): Promise<string | n
   for (const model of models) {
     try {
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': process.env.GEMINI_API_KEY!,
+          },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: { responseModalities: ['IMAGE'] },
