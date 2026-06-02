@@ -109,7 +109,7 @@ export default function EditRecipePage() {
           </button>
         </div>
 
-        <div className="bg-white rounded-lg p-6 shadow-sm space-y-5">
+        <div className="bg-white rounded-lg p-6  space-y-5">
           <div>
             <p className="text-xs font-semibold text-gray-400 mb-1">タイトル</p>
             <input className="text-xl font-bold w-full focus:outline-none border-b border-gray-100 pb-2"

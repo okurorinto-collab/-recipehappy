@@ -185,7 +185,7 @@ export default function NewRecipePage() {
         {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
         {extracted && (
-          <div className="bg-white rounded-lg p-5 mb-4 shadow-sm space-y-4">
+          <div className="bg-white rounded-lg p-5 mb-4  space-y-4">
             <input className="text-lg font-bold w-full border-b border-gray-100 pb-2 focus:outline-none"
               value={extracted.title}
               onChange={(e) => setExtracted({ ...extracted, title: e.target.value })} />

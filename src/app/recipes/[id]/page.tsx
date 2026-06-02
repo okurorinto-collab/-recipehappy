@@ -48,12 +48,12 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
         )}
         <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4">
           <Link href="/recipes"
-            className="bg-white/90 backdrop-blur-sm w-9 h-9 rounded-lg flex items-center justify-center shadow-sm text-gray-700 hover:bg-white transition">
+            className="bg-white/90 backdrop-blur-sm w-9 h-9 rounded-lg flex items-center justify-center  text-gray-700 hover:bg-white transition">
             ←
           </Link>
           <div className="flex gap-2">
             <Link href={`/recipes/${id}/edit`}
-              className="bg-white/90 backdrop-blur-sm px-3 h-9 rounded-lg flex items-center text-sm font-medium text-gray-700 shadow-sm hover:bg-white transition">
+              className="bg-white/90 backdrop-blur-sm px-3 h-9 rounded-lg flex items-center text-sm font-medium text-gray-700  hover:bg-white transition">
               編集
             </Link>
             <DeleteButton id={id} />
@@ -62,7 +62,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
       </div>
 
       <div className="max-w-lg mx-auto px-4 pb-10">
-        <div className="bg-white rounded-lg shadow-sm -mt-6 relative z-10 p-5 mb-4">
+        <div className="bg-white rounded-lg  -mt-6 relative z-10 p-5 mb-4">
           <h1 className="text-xl font-bold text-gray-900 mb-1">{recipe.title}</h1>
           {recipe.source_url && (
             <a href={recipe.source_url} target="_blank" rel="noopener noreferrer"
@@ -72,7 +72,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
 
         {/* 食材・調味料 */}
         {(ingredients.length > 0 || seasonings.length > 0) && (
-          <div className="bg-white rounded-lg shadow-sm p-5 mb-4">
+          <div className="bg-white rounded-lg  p-5 mb-4">
             <h2 className="font-bold text-gray-800 mb-4">材料</h2>
             {ingredients.length > 0 && (
               <div className="mb-4">
@@ -111,7 +111,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
 
         {/* 作り方 */}
         {steps.length > 0 && (
-          <div className="bg-white rounded-lg shadow-sm p-5">
+          <div className="bg-white rounded-lg  p-5">
             <h2 className="font-bold text-gray-800 mb-4">作り方</h2>
             <div className="space-y-4">
               {steps.map((step, i) => (

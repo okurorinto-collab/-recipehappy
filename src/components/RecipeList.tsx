@@ -86,7 +86,7 @@ export default function RecipeList({
           <div className="grid grid-cols-2 gap-3">
             {filtered.map((recipe) => (
               <Link key={recipe.id} href={`/recipes/${recipe.id}`}
-                className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
+                className="bg-white rounded-lg  overflow-hidden hover: transition">
                 <div className="relative w-full aspect-square bg-gradient-to-br from-green-100 to-green-200">
                   {recipe.thumbnail_url ? (
                     <img src={recipe.thumbnail_url} alt={recipe.title}
