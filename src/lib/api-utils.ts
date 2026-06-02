@@ -78,13 +78,20 @@ function toEnglishQuery(title: string): string {
 // Geminiで料理名→Pexels検索用の英語キーワードを生成
 async function generateSearchKeywords(title: string): Promise<string[]> {
   try {
-    const { GoogleGenerativeAI } = await import('@google/generative-ai')
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
-    const r = await model.generateContent(
-      `料理「${title}」の写真をストックフォトで探すための英語検索キーワードを、ヒットしやすい順に3つ、カンマ区切りだけで返してください（説明不要）。例: fluffy pancakes, japanese pancake, dessert`
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: `料理「${title}」の写真をストックフォトで探すための英語検索キーワードを、ヒットしやすい順に3つ、カンマ区切りだけで返してください（説明不要）。例: fluffy pancakes, japanese pancake, dessert` }] }],
+        }),
+        signal: AbortSignal.timeout(15000),
+      }
     )
-    return r.response.text().trim().split(',').map(s => s.trim()).filter(Boolean).slice(0, 3)
+    const data = await res.json()
+    const text = data.candidates?.[0]?.content?.parts?.map((p: { text?: string }) => p.text ?? '').join('') ?? ''
+    return text.trim().split(',').map((s: string) => s.trim()).filter(Boolean).slice(0, 3)
   } catch {
     return []
   }
