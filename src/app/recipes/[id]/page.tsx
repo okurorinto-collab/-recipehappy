@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import DeleteButton from '@/components/DeleteButton'
+import FetchThumbnailButton from '@/components/FetchThumbnailButton'
 import { parseItem } from '@/lib/utils'
 
 function parseSteps(steps: string): string[] {
@@ -40,12 +41,19 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
         )}
         <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4">
           <Link href="/recipes"
-            className="bg-white/90 backdrop-blur-sm w-9 h-9 rounded-lg flex items-center justify-center  text-gray-700 hover:bg-white transition">
+            className="bg-white/90 backdrop-blur-sm w-9 h-9 rounded-lg flex items-center justify-center text-gray-700 hover:bg-white transition">
             ←
           </Link>
           <div className="flex gap-2">
+            {!recipe.thumbnail_url && (
+              <FetchThumbnailButton
+                recipeId={id}
+                title={recipe.title}
+                sourceUrl={recipe.source_url}
+              />
+            )}
             <Link href={`/recipes/${id}/edit`}
-              className="bg-white/90 backdrop-blur-sm px-3 h-9 rounded-lg flex items-center text-sm font-medium text-gray-700  hover:bg-white transition">
+              className="bg-white/90 backdrop-blur-sm px-3 h-9 rounded-lg flex items-center text-sm font-medium text-gray-700 hover:bg-white transition">
               編集
             </Link>
             <DeleteButton id={id} />
