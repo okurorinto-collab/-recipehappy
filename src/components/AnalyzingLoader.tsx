@@ -11,25 +11,28 @@ export default function AnalyzingLoader() {
   const [fade, setFade] = useState(true)
 
   useEffect(() => {
-    // ランダム初期表示
-    setCurrentTrivia(trivia[Math.floor(Math.random() * trivia.length)])
+    // シャッフルして重複なしキュー作成
+    const shuffled = [...trivia].sort(() => Math.random() - 0.5)
+    let index = 0
+    setCurrentTrivia(shuffled[index])
 
-    // プログレスバー
+    // プログレスバー（38秒で95%）
     const start = Date.now()
-    const duration = 18000
+    const duration = 38000
     const progressTimer = setInterval(() => {
       const elapsed = Date.now() - start
       setProgress(Math.min(95, Math.floor((elapsed / duration) * 95)))
     }, 100)
 
-    // 雑学を5秒ごとに切り替え
+    // 雑学を7秒ごとに切り替え（重複なし）
     const triviaTimer = setInterval(() => {
       setFade(false)
       setTimeout(() => {
-        setCurrentTrivia(trivia[Math.floor(Math.random() * trivia.length)])
+        index = (index + 1) % shuffled.length
+        setCurrentTrivia(shuffled[index])
         setFade(true)
-      }, 400)
-    }, 5000)
+      }, 800)
+    }, 7000)
 
     return () => {
       clearInterval(progressTimer)
@@ -44,7 +47,7 @@ export default function AnalyzingLoader() {
       </div>
 
       <div className="text-center mb-2">
-        <p className="font-semibold text-gray-700 text-base">レシピを書いてます...</p>
+        <p className="font-semibold text-gray-700 text-base text-center">レシピを書いてます...</p>
       </div>
 
       {/* プログレスバー */}
@@ -54,10 +57,10 @@ export default function AnalyzingLoader() {
       </div>
 
       {/* 雑学 */}
-      <div className={`mt-4 bg-gray-50 rounded-lg p-4 max-w-sm w-full transition-opacity duration-400 ${fade ? 'opacity-100' : 'opacity-0'}`}>
-        <p className="text-xs font-semibold text-green-600 mb-1">{currentTrivia.category}</p>
-        <p className="text-sm font-bold text-gray-800 mb-1">{currentTrivia.title}</p>
-        <p className="text-xs text-gray-500 leading-relaxed">{currentTrivia.text}</p>
+      <div className={`mt-4 bg-gray-50 rounded-lg p-4 max-w-sm w-full transition-opacity duration-700 ${fade ? 'opacity-100' : 'opacity-0'}`}>
+        <p className="text-xs font-semibold text-green-600 mb-1 text-center">{currentTrivia.category}</p>
+        <p className="text-sm font-bold text-gray-800 mb-1 text-center">{currentTrivia.title}</p>
+        <p className="text-xs text-gray-500 leading-relaxed text-center">{currentTrivia.text}</p>
       </div>
     </div>
   )
