@@ -11,13 +11,14 @@ export async function GET(request: NextRequest) {
 
   const q = request.nextUrl.searchParams.get('q') ?? ''
   const sourceUrl = request.nextUrl.searchParams.get('sourceUrl') ?? ''
-  console.log('[thumbnail-search] start q:', q, 'sourceUrl:', sourceUrl)
+  const regen = request.nextUrl.searchParams.get('regen') === '1'
+  console.log('[thumbnail-search] start q:', q, 'sourceUrl:', sourceUrl, 'regen:', regen)
 
-  // 1. 元ネタURLのog:imageを優先（SNSはスキップ）
+  // 1. 元ネタURLのog:imageを優先（SNSはスキップ。再取得時はスキップして別画像を探す）
   const skipDomains = ['instagram.com', 'x.com', 'twitter.com', 'tiktok.com', 'facebook.com']
   const isSns = skipDomains.some(d => sourceUrl.includes(d))
 
-  if (sourceUrl && !isSns) {
+  if (!regen && sourceUrl && !isSns) {
     const ogImage = await fetchOgImage(sourceUrl)
     console.log('[thumbnail-search] ogImage:', ogImage)
     if (ogImage && !ogImage.includes('rsrc.php') && !ogImage.includes('logo')) {
@@ -25,9 +26,9 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // 2. Pexelsでタイトル検索（APIキーが設定されている場合）
+  // 2. Pexelsでタイトル検索（再取得時はランダムに別候補）
   if (q && process.env.PEXELS_API_KEY) {
-    const url = await fetchPexelsThumbnail(q)
+    const url = await fetchPexelsThumbnail(q, [], regen)
     console.log('[thumbnail-search] pexels:', url)
     if (url) return NextResponse.json({ url })
   }

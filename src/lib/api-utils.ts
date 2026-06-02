@@ -90,20 +90,24 @@ async function generateSearchKeywords(title: string): Promise<string[]> {
   }
 }
 
-async function searchPexels(query: string): Promise<string | null> {
+async function searchPexels(query: string, random = false): Promise<string | null> {
   try {
     const res = await fetch(
-      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1&orientation=landscape`,
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=15&orientation=landscape`,
       { headers: { Authorization: process.env.PEXELS_API_KEY! } }
     )
     const data = await res.json()
-    return data.photos?.[0]?.src?.medium ?? null
+    const photos = data.photos ?? []
+    if (photos.length === 0) return null
+    // 再取得時はランダム、初回は先頭
+    const idx = random ? Math.floor(Math.random() * photos.length) : 0
+    return photos[idx]?.src?.medium ?? null
   } catch {
     return null
   }
 }
 
-export async function fetchPexelsThumbnail(title: string, ingredients: string[] = []): Promise<string | null> {
+export async function fetchPexelsThumbnail(title: string, ingredients: string[] = [], random = false): Promise<string | null> {
   const mainIngredient = ingredients[0]?.split('|')[0] ?? ''
   const enTitle = toEnglishQuery(title)
 
@@ -118,7 +122,7 @@ export async function fetchPexelsThumbnail(title: string, ingredients: string[] 
   ].filter((q, i, arr) => q && arr.indexOf(q) === i)
 
   for (const q of queries) {
-    const url = await searchPexels(q)
+    const url = await searchPexels(q, random)
     if (url) return url
   }
   return null

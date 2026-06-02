@@ -126,7 +126,7 @@ export default function EditRecipePage() {
                 onClick={async () => {
                   setFetchingThumb(true)
                   try {
-                    const params = new URLSearchParams({ q: title })
+                    const params = new URLSearchParams({ q: title, regen: '1' })
                     if (sourceUrl) params.set('sourceUrl', sourceUrl)
                     const r = await fetch(`/api/thumbnail-search?${params}`)
                     const data = await r.json()
@@ -137,7 +137,7 @@ export default function EditRecipePage() {
                 }}
                 disabled={fetchingThumb}
                 className="text-xs text-green-600 hover:text-green-700 disabled:opacity-40">
-                {fetchingThumb ? '取得中...' : '🔍 自動取得'}
+                {fetchingThumb ? '取得中...' : '🔄 画像を再取得'}
               </button>
             </div>
             <input type="url" className="w-full text-sm border-b border-gray-200 focus:outline-none pb-1 text-gray-700"
