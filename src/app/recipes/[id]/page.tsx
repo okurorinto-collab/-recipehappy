@@ -37,8 +37,8 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-lg mx-auto">
-      {/* ヘッダー画像 - 全幅・左右2px・4:3 */}
-      <div className="relative mx-[2px] aspect-[4/3] bg-gradient-to-br from-green-100 to-green-200 overflow-hidden">
+      {/* ヘッダー画像 */}
+      <div className="relative w-full h-56 bg-gradient-to-br from-green-100 to-green-200 overflow-hidden">
         {recipe.thumbnail_url && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={recipe.thumbnail_url} alt={recipe.title} className="w-full h-full object-cover" />
