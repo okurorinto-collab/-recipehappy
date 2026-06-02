@@ -35,6 +35,7 @@ export default function EditRecipePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [fetchingThumb, setFetchingThumb] = useState(false)
 
   useEffect(() => {
     supabase.from('recipes').select('*').eq('id', id).single().then(({ data }) => {
@@ -122,7 +123,24 @@ export default function EditRecipePage() {
               value={sourceUrl} onChange={(e) => setSourceUrl(e.target.value)} placeholder="https://..." />
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-400 mb-1">サムネイル画像URL</p>
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-xs font-semibold text-gray-400">サムネイル画像URL</p>
+              <button
+                onClick={async () => {
+                  setFetchingThumb(true)
+                  try {
+                    const r = await fetch(`/api/thumbnail-search?q=${encodeURIComponent(title)}`)
+                    const data = await r.json()
+                    if (data.url) setThumbnailUrl(data.url)
+                  } finally {
+                    setFetchingThumb(false)
+                  }
+                }}
+                disabled={fetchingThumb}
+                className="text-xs text-green-600 hover:text-green-700 disabled:opacity-40">
+                {fetchingThumb ? '取得中...' : '🔍 自動取得'}
+              </button>
+            </div>
             <input type="url" className="w-full text-sm border-b border-gray-200 focus:outline-none pb-1 text-gray-700"
               value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} placeholder="Google画像検索などから貼り付け" />
             {thumbnailUrl && (
