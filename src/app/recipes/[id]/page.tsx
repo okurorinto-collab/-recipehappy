@@ -35,9 +35,9 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
   const steps = recipe.steps ? parseSteps(recipe.steps) : []
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* ヘッダー画像 */}
-      <div className="relative w-full h-56 bg-gradient-to-br from-green-100 to-green-200">
+    <div className="min-h-screen bg-white">
+      {/* ヘッダー画像 - 全幅・左右2px・4:3 */}
+      <div className="relative mx-[2px] aspect-[4/3] bg-gradient-to-br from-green-100 to-green-200 overflow-hidden">
         {recipe.thumbnail_url && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={recipe.thumbnail_url} alt={recipe.title} className="w-full h-full object-cover" />
@@ -58,71 +58,70 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto px-4 pb-10">
-        <div className="bg-white rounded-lg  -mt-6 relative z-10 p-5 mb-4">
-          <h1 className="text-xl font-bold text-gray-900 mb-1">{recipe.title}</h1>
-          {recipe.source_url && (
-            <a href={recipe.source_url} target="_blank" rel="noopener noreferrer"
-              className="text-green-500 text-xs hover:underline">元のURL →</a>
-          )}
-        </div>
-
-        {/* 食材・調味料 */}
-        {(ingredients.length > 0 || seasonings.length > 0) && (
-          <div className="bg-white rounded-lg  p-5 mb-4">
-            <h2 className="font-bold text-gray-800 mb-4">材料</h2>
-            {ingredients.length > 0 && (
-              <div className="mb-4">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">食材</p>
-                <div className="space-y-2">
-                  {ingredients.map((ing, i) => {
-                    const { name, amount } = parseItem(ing)
-                    return (
-                      <div key={i} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
-                        <span className="font-semibold text-gray-800 text-sm">{name}</span>
-                        <span className="text-gray-500 text-sm">{amount}</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-            {seasonings.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">調味料</p>
-                <div className="space-y-2">
-                  {seasonings.map((s, i) => {
-                    const { name, amount } = parseItem(s)
-                    return (
-                      <div key={i} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
-                        <span className="font-semibold text-gray-800 text-sm">{name}</span>
-                        <span className="text-gray-500 text-sm">{amount}</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 作り方 */}
-        {steps.length > 0 && (
-          <div className="bg-white rounded-lg  p-5">
-            <h2 className="font-bold text-gray-800 mb-4">作り方</h2>
-            <div className="space-y-4">
-              {steps.map((step, i) => (
-                <div key={i} className="flex gap-4">
-                  <div className="flex-shrink-0 w-7 h-7 rounded-full border-2 border-green-400 flex items-center justify-center text-xs font-bold text-green-500">
-                    {i + 1}
-                  </div>
-                  <p className="text-gray-700 text-sm leading-relaxed pt-0.5">{step}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* タイトル */}
+      <div className="px-4 py-4 border-b border-gray-100">
+        <h1 className="text-xl font-bold text-gray-900 mb-1">{recipe.title}</h1>
+        {recipe.source_url && (
+          <a href={recipe.source_url} target="_blank" rel="noopener noreferrer"
+            className="text-green-500 text-xs hover:underline">元のURL →</a>
         )}
       </div>
+
+      {/* 食材・調味料 */}
+      {(ingredients.length > 0 || seasonings.length > 0) && (
+        <div className="px-4 py-4 border-b border-gray-100">
+          <h2 className="font-bold text-gray-800 mb-3">材料</h2>
+          {ingredients.length > 0 && (
+            <div className="mb-4">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">食材</p>
+              <div className="divide-y divide-gray-100">
+                {ingredients.map((ing, i) => {
+                  const { name, amount } = parseItem(ing)
+                  return (
+                    <div key={i} className="flex justify-between items-center py-2">
+                      <span className="font-semibold text-gray-800 text-sm">{name}</span>
+                      <span className="text-gray-500 text-sm">{amount}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+          {seasonings.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">調味料</p>
+              <div className="divide-y divide-gray-100">
+                {seasonings.map((s, i) => {
+                  const { name, amount } = parseItem(s)
+                  return (
+                    <div key={i} className="flex justify-between items-center py-2">
+                      <span className="font-semibold text-gray-800 text-sm">{name}</span>
+                      <span className="text-gray-500 text-sm">{amount}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 作り方 */}
+      {steps.length > 0 && (
+        <div className="px-4 py-4 pb-12">
+          <h2 className="font-bold text-gray-800 mb-3">作り方</h2>
+          <div className="divide-y divide-gray-100">
+            {steps.map((step, i) => (
+              <div key={i} className="flex gap-4 py-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full border-2 border-green-400 flex items-center justify-center text-xs font-bold text-green-500">
+                  {i + 1}
+                </div>
+                <p className="text-gray-700 text-sm leading-relaxed">{step}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
