@@ -89,7 +89,7 @@ export default function RecipeList({
             {filtered.map((recipe) => (
               <Link key={recipe.id} href={`/recipes/${recipe.id}`}
                 className="bg-white rounded-lg  overflow-hidden hover: transition">
-                <div className="relative w-full aspect-square bg-gradient-to-br from-green-100 to-green-200">
+                <div className="relative w-full aspect-[3/4] bg-gradient-to-br from-green-100 to-green-200">
                   {recipe.thumbnail_url ? (
                     <img src={recipe.thumbnail_url} alt={recipe.title}
                       className="w-full h-full object-cover"
@@ -98,8 +98,8 @@ export default function RecipeList({
                     <div className="w-full h-full flex items-center justify-center text-4xl">🍳</div>
                   )}
                 </div>
-                <div className="p-3">
-                  <h2 className="font-semibold text-gray-800 text-sm leading-snug line-clamp-2">{recipe.title}</h2>
+                <div className="px-2 py-1.5">
+                  <h2 className="font-medium text-gray-800 text-xs leading-snug line-clamp-2">{recipe.title}</h2>
                 </div>
               </Link>
             ))}
