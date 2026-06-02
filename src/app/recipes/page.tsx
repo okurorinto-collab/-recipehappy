@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import RecipeList from '@/components/RecipeList'
+import { Suspense } from 'react'
 
 export default async function RecipesPage({
   searchParams,
@@ -45,11 +46,13 @@ export default async function RecipesPage({
           </div>
         </div>
 
-        <RecipeList
-          recipes={recipes ?? []}
-          filterIngredients={filterIngredients}
-          activeCategory={category ?? ''}
-        />
+        <Suspense fallback={<div className="p-4 text-gray-400 text-sm">読み込み中...</div>}>
+          <RecipeList
+            recipes={recipes ?? []}
+            filterIngredients={filterIngredients}
+            activeCategory={category ?? ''}
+          />
+        </Suspense>
       </div>
     </div>
   )
