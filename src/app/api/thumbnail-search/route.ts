@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/supabase/auth-check'
-import { fetchPexelsThumbnail, fetchOgImage, fetchWikipediaImage } from '@/lib/api-utils'
+import { createClient } from '@/lib/supabase/server'
+import { fetchPexelsThumbnail, fetchOgImage, fetchWikipediaImage, generateFoodImageBase64 } from '@/lib/api-utils'
 
 export async function GET(request: NextRequest) {
   const user = await getAuthUser()
@@ -38,6 +39,29 @@ export async function GET(request: NextRequest) {
     const url = await fetchWikipediaImage(q)
     console.log('[thumbnail-search] wikipedia:', url)
     if (url) return NextResponse.json({ url })
+  }
+
+  // 4. それでも無ければGeminiで画像生成→Supabase Storageへ保存
+  if (q) {
+    const base64 = await generateFoodImageBase64(q)
+    if (base64) {
+      try {
+        const supabase = await createClient()
+        const buffer = Buffer.from(base64, 'base64')
+        const fileName = `gen-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.png`
+        const { error } = await supabase.storage
+          .from('recipe-images')
+          .upload(fileName, buffer, { contentType: 'image/png', upsert: false })
+        if (!error) {
+          const { data } = supabase.storage.from('recipe-images').getPublicUrl(fileName)
+          console.log('[thumbnail-search] generated:', data.publicUrl)
+          return NextResponse.json({ url: data.publicUrl, generated: true })
+        }
+        console.error('[thumbnail-search] storage upload error:', error)
+      } catch (e) {
+        console.error('[thumbnail-search] generation save error:', e)
+      }
+    }
   }
 
   console.log('[thumbnail-search] 全ソース失敗')
