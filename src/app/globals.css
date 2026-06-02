@@ -10,6 +10,15 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-green-50: #f5f8ed;
+  --color-green-100: #e8f0d0;
+  --color-green-200: #d2e1a1;
+  --color-green-300: #bbd273;
+  --color-green-400: #aac54a;
+  --color-green-500: #9FBB60;
+  --color-green-600: #7a9249;
+  --color-green-700: #5c6e37;
 }
 
 @media (prefers-color-scheme: dark) {
