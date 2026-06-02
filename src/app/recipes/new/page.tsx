@@ -125,12 +125,16 @@ export default function NewRecipePage() {
       )}
 
       <div className="max-w-lg mx-auto">
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-2">
           <button onClick={() => router.back()} className="text-gray-500 hover:text-gray-700">←</button>
           <h1 className="text-xl font-bold text-gray-800">レシピを追加</h1>
         </div>
+        <p className="text-xs text-gray-400 mb-5 leading-relaxed">
+          画像からでもURLからでもレシピが追加されます。画像から追加する場合、参考URLをついでに貼ると、サイトからレシピを遡ることができます。
+        </p>
 
         {/* 複数画像アップロード */}
+        <p className="text-xs font-semibold text-gray-500 mb-2">📷 写真から追加</p>
         <div className="mb-4">
           <div className="flex gap-2 flex-wrap">
             {previews.map((p, i) => (
@@ -150,6 +154,7 @@ export default function NewRecipePage() {
             onChange={(e) => { if (e.target.files) handleFiles(e.target.files) }} />
         </div>
 
+        <p className="text-xs font-semibold text-gray-500 mb-2">🔗 URLから追加</p>
         <div className="mb-4">
           <input type="url" placeholder="レシピのURLを貼ってください（任意）" value={sourceUrl}
             onChange={(e) => { setSourceUrl(e.target.value); setUrlCheck(null) }}
