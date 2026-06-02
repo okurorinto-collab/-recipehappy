@@ -37,7 +37,9 @@ export default function EditRecipePage() {
 
       // サムネイルが空なら自動取得
       if (!thumb) {
-        fetch(`/api/thumbnail-search?q=${encodeURIComponent(data.title)}`)
+        const params = new URLSearchParams({ q: data.title })
+        if (data.source_url) params.set('sourceUrl', data.source_url)
+        fetch(`/api/thumbnail-search?${params}`)
           .then(r => r.json())
           .then(d => { if (d.url) setThumbnailUrl(d.url) })
           .catch(() => {})
@@ -124,7 +126,9 @@ export default function EditRecipePage() {
                 onClick={async () => {
                   setFetchingThumb(true)
                   try {
-                    const r = await fetch(`/api/thumbnail-search?q=${encodeURIComponent(title)}`)
+                    const params = new URLSearchParams({ q: title })
+                    if (sourceUrl) params.set('sourceUrl', sourceUrl)
+                    const r = await fetch(`/api/thumbnail-search?${params}`)
                     const data = await r.json()
                     if (data.url) setThumbnailUrl(data.url)
                   } finally {
