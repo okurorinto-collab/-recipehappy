@@ -6,7 +6,9 @@ import FetchThumbnailButton from '@/components/FetchThumbnailButton'
 import { parseItem } from '@/lib/utils'
 
 function parseSteps(steps: string): string[] {
-  return steps
+  // "。2. " のようなインライン番号を改行に正規化してから分割
+  const normalized = steps.replace(/([。．])\s*\d+[.．]\s+/g, '$1\n')
+  return normalized
     .split(/\n|①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩/)
     .map(s => s.replace(/^[\d\s．.、。]+/, '').trim())
     .filter(Boolean)
