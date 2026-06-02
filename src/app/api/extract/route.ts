@@ -105,15 +105,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'レシピが見つかりませんでした' }, { status: 422 })
     }
 
-    // Pexelsサムネイル取得
+    // Pexelsサムネイル取得（タイトル→メイン食材の順でフォールバック）
     let thumbnailUrl: string | null = null
     try {
-      const query = encodeURIComponent(finalResult.title)
-      const pexelsRes = await fetch(`https://api.pexels.com/v1/search?query=${query}&per_page=1&orientation=landscape`, {
-        headers: { Authorization: process.env.PEXELS_API_KEY! },
-      })
-      const pexelsData = await pexelsRes.json()
-      thumbnailUrl = pexelsData.photos?.[0]?.src?.medium ?? null
+      const mainIngredient = finalResult.ingredients?.[0]?.split('|')[0] ?? ''
+      const queries = [
+        finalResult.title,
+        mainIngredient ? `${mainIngredient} 料理` : '',
+        '料理 food',
+      ].filter(Boolean)
+
+      for (const q of queries) {
+        const pexelsRes = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=1&orientation=landscape`, {
+          headers: { Authorization: process.env.PEXELS_API_KEY! },
+        })
+        const pexelsData = await pexelsRes.json()
+        thumbnailUrl = pexelsData.photos?.[0]?.src?.medium ?? null
+        if (thumbnailUrl) break
+      }
     } catch { /* 無視 */ }
 
     return NextResponse.json({
