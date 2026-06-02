@@ -75,26 +75,51 @@ function toEnglishQuery(title: string): string {
   return title
 }
 
+// Geminiで料理名→Pexels検索用の英語キーワードを生成
+async function generateSearchKeywords(title: string): Promise<string[]> {
+  try {
+    const { GoogleGenerativeAI } = await import('@google/generative-ai')
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
+    const r = await model.generateContent(
+      `料理「${title}」の写真をストックフォトで探すための英語検索キーワードを、ヒットしやすい順に3つ、カンマ区切りだけで返してください（説明不要）。例: fluffy pancakes, japanese pancake, dessert`
+    )
+    return r.response.text().trim().split(',').map(s => s.trim()).filter(Boolean).slice(0, 3)
+  } catch {
+    return []
+  }
+}
+
+async function searchPexels(query: string): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1&orientation=landscape`,
+      { headers: { Authorization: process.env.PEXELS_API_KEY! } }
+    )
+    const data = await res.json()
+    return data.photos?.[0]?.src?.medium ?? null
+  } catch {
+    return null
+  }
+}
+
 export async function fetchPexelsThumbnail(title: string, ingredients: string[] = []): Promise<string | null> {
   const mainIngredient = ingredients[0]?.split('|')[0] ?? ''
   const enTitle = toEnglishQuery(title)
+
+  // 1. Geminiが生成した英語キーワードを最優先で試す
+  const aiKeywords = await generateSearchKeywords(title)
+
   const queries = [
-    enTitle !== title ? enTitle : title,
-    title,
+    ...aiKeywords,
+    enTitle !== title ? enTitle : '',
     mainIngredient ? `${mainIngredient} food` : '',
     'Japanese food',
   ].filter((q, i, arr) => q && arr.indexOf(q) === i)
 
   for (const q of queries) {
-    try {
-      const res = await fetch(
-        `https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=1&orientation=landscape`,
-        { headers: { Authorization: process.env.PEXELS_API_KEY! } }
-      )
-      const data = await res.json()
-      const url = data.photos?.[0]?.src?.medium ?? null
-      if (url) return url
-    } catch { /* continue */ }
+    const url = await searchPexels(q)
+    if (url) return url
   }
   return null
 }
