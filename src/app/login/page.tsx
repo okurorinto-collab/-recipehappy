@@ -20,7 +20,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white rounded-lg shadow-sm p-10 flex flex-col items-center gap-6 w-full max-w-sm">
         <div className="text-5xl">🍳</div>
-        <h1 className="text-2xl font-bold text-gray-800">レシピ帳</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Recihappy</h1>
         <p className="text-gray-500 text-sm text-center">
           スクショからレシピを自動保存
         </p>

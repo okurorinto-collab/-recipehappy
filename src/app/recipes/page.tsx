@@ -45,7 +45,7 @@ export default async function RecipesPage({
         <div className="flex items-center justify-between mb-6 pt-2">
           <div>
             <p className="text-xs text-gray-400 mb-0.5">My Recipes</p>
-            <h1 className="text-2xl font-bold text-gray-900">レシピ帳</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Recihappy</h1>
           </div>
           <Link
             href="/recipes/new"
