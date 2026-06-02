@@ -11,8 +11,9 @@ export async function fetchOgImage(url: string): Promise<string | null> {
       signal: AbortSignal.timeout(5000),
     })
     const html = await res.text()
-    const match = html.match(/<meta[^>]+(?:property="og:image"|name="og:image")[^>]+content="([^"]+)"/i)
-      ?? html.match(/<meta[^>]+content="([^"]+)"[^>]+(?:property="og:image"|name="og:image")/i)
+    const match =
+      html.match(/<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["']/i) ??
+      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["']/i)
     const ogUrl = match?.[1] ?? null
     if (!ogUrl) return null
     if (LOGO_PATTERNS.some(p => ogUrl.toLowerCase().includes(p))) return null
