@@ -70,7 +70,7 @@ export default function RecipeList({
         })}
       </div>
 
-      {/* レシピグリッド */}
+      {/* レシピ */}
       <div className="px-4 pt-4 pb-8">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
