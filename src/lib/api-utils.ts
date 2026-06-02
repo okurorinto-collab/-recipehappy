@@ -2,12 +2,13 @@
 
 const SNS_DOMAINS = ['instagram.com', 'x.com', 'twitter.com', 'tiktok.com', 'facebook.com']
 const LOGO_PATTERNS = ['rsrc.php', '/logo', 'brand', 'icon', 'favicon']
+const BROWSER_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
 export async function fetchOgImage(url: string): Promise<string | null> {
   if (SNS_DOMAINS.some(d => url.includes(d))) return null
   try {
     const res = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0' },
+      headers: { 'User-Agent': BROWSER_UA },
       signal: AbortSignal.timeout(5000),
     })
     const html = await res.text()
@@ -27,6 +28,31 @@ export async function fetchOgImage(url: string): Promise<string | null> {
   } catch {
     return null
   }
+}
+
+// Wikipedia REST API（認証不要・無料）でレシピタイトルから画像を取得
+export async function fetchWikipediaImage(title: string): Promise<string | null> {
+  // タイトルを「と」「の」などで分割して候補キーワードを作る
+  const candidates = [
+    title,
+    ...title.split(/[とのをがにでは、。]/).map(s => s.trim()).filter(s => s.length > 1),
+  ]
+  for (const query of candidates) {
+    try {
+      const res = await fetch(
+        `https://ja.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`,
+        {
+          headers: { 'User-Agent': 'RecipeHappy/1.0' },
+          signal: AbortSignal.timeout(4000),
+        }
+      )
+      if (!res.ok) continue
+      const data = await res.json()
+      const url: string | null = data.thumbnail?.source ?? null
+      if (url) return url
+    } catch { continue }
+  }
+  return null
 }
 
 export async function fetchPexelsThumbnail(title: string, ingredients: string[] = []): Promise<string | null> {
