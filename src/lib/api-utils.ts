@@ -11,13 +11,19 @@ export async function fetchOgImage(url: string): Promise<string | null> {
       signal: AbortSignal.timeout(5000),
     })
     const html = await res.text()
-    const match =
-      html.match(/<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["']/i) ??
-      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["']/i)
-    const ogUrl = match?.[1] ?? null
-    if (!ogUrl) return null
-    if (LOGO_PATTERNS.some(p => ogUrl.toLowerCase().includes(p))) return null
-    return ogUrl
+    const patterns = [
+      /<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["']/i,
+      /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["']/i,
+      /<meta[^>]+(?:name|property)=["']twitter:image["'][^>]+content=["']([^"']+)["']/i,
+      /<meta[^>]+content=["']([^"']+)["'][^>]+(?:name|property)=["']twitter:image["']/i,
+    ]
+    for (const pattern of patterns) {
+      const ogUrl = html.match(pattern)?.[1] ?? null
+      if (!ogUrl) continue
+      if (LOGO_PATTERNS.some(p => ogUrl.toLowerCase().includes(p))) continue
+      return ogUrl
+    }
+    return null
   } catch {
     return null
   }
