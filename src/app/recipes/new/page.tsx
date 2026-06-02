@@ -155,7 +155,8 @@ export default function NewRecipePage() {
             onChange={(e) => { if (e.target.files) handleFiles(e.target.files) }} />
         </div>
 
-        <p className="text-xs font-semibold text-gray-500 mb-2">URLから追加</p>
+        <p className="text-xs font-semibold text-gray-500 mb-0.5">URLから追加</p>
+        <p className="text-xs text-gray-400 mb-2">レシピサイトやYouTubeのURLに対応。Instagram・X・TikTokなどのSNSは非対応。</p>
         <div className="mb-4">
           <input type="url" placeholder="レシピのURLを貼ってください（任意）" value={sourceUrl}
             onChange={(e) => { setSourceUrl(e.target.value); setUrlCheck(null) }}
