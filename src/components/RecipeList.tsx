@@ -99,7 +99,8 @@ export default function RecipeList({
                 <div className="relative w-full aspect-square bg-gradient-to-br from-green-100 to-green-200">
                   {recipe.thumbnail_url ? (
                     <img src={recipe.thumbnail_url} alt={recipe.title}
-                      className="w-full h-full object-cover" />
+                      className="w-full h-full object-cover"
+                      onError={(e) => { e.currentTarget.style.display = 'none' }} />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-4xl">🍳</div>
                   )}
