@@ -119,7 +119,7 @@ async function searchPexels(query: string, random = false): Promise<string | nul
 
 // Geminiで料理画像を生成し、base64(PNG)を返す
 export async function generateFoodImageBase64(title: string): Promise<string | null> {
-  const models = ['gemini-2.5-flash-image-preview', 'gemini-2.0-flash-preview-image-generation']
+  const models = ['gemini-2.5-flash-image', 'gemini-3.1-flash-image']
   const prompt = `A delicious, appetizing photo of the Japanese dish "${title}". Professional food photography, natural soft lighting, served on a simple plate, slight top-down angle, clean minimal background, high quality.`
 
   for (const model of models) {
